@@ -5,7 +5,7 @@ B5= raster("2/B5.tif")
 B10= raster("2/B10.tif")
 zasieg = shapefile("shp/lbn_92.shp")
 
-#blalal
+
 B4 = crop(B4,zasieg)
 B5 = crop(B5,zasieg)
 B10 = crop(B10,zasieg)
@@ -37,12 +37,20 @@ f = file.path("D:/studia_mgr/Analizy/TempBDOT10k/wyniki/temp.tif")
 writeRaster(LST,f)
 
 library(stars)
-temp = read_stars("D:/studia_mgr/Analizy/TempBDOT10k/wyniki/temp.tif")
-cment = st_read("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/cmentarze.shp")
+temp = raster("D:/studia_mgr/Analizy/TempBDOT10k/wyniki/temp.tif")
+cment = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/cmentarze.shp")
 
-plot(temp)
-library(tmap)
+cmentarze = subset(cment,cment$X_KOD =="KUSC01")
 
-tm = tm_shape(cment) +
-  tm_polygons() +
-  tm_raster(temp)
+cmentarze$mean = exact_extract(temp,cmentarze,'mean')
+
+write_sf(cmentarze,"D:/studia_mgr/Analizy/TempBDOT10k/wyniki/cmentarze.shp")
+
+wart = extract(temp,cmentarze,method= 'simple')
+
+num=1
+for (i in lengths(wart)){
+  wart[num] = mean(wart[[num]])
+  num = num +1
+}
+
