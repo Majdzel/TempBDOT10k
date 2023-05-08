@@ -5,7 +5,7 @@ B5= raster("2/B5.tif")
 B10= raster("2/B10.tif")
 zasieg = shapefile("shp/lbn_92.shp")
 
-#2
+#blalal
 B4 = crop(B4,zasieg)
 B5 = crop(B5,zasieg)
 B10 = crop(B10,zasieg)
