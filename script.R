@@ -41,13 +41,28 @@ writeRaster(LST,f)
 
 #-----ANALIZA------
 library(exactextractr)
+#---Rastry---
 temp = raster("D:/studia_mgr/Analizy/TempBDOT10k/wyniki/temp.tif")
+#---Poligony---
 cment = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/cmentarze.shp")
+parki = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/parki.shp")
+lasy  = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/lasy.shp")
+place = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/place.shp")
 
-cmentarze = subset(cment,cment$X_KOD =="KUSC01")
-cmentarze$mean = exact_extract(temp,cmentarze,'mean')
+#---ExtractValue-----
+cment = subset(cment,cment$X_KOD =="KUSC01")
+cment$mean = exact_extract(temp,cment,'mean')
 
-write_sf(cmentarze,"D:/studia_mgr/Analizy/TempBDOT10k/wyniki/cmentarze.shp")
+parki = subset(parki,parki$X_KOD =="KUSK04	")
+parki$mean = exact_extract(temp,parki,'mean')
+
+lasy = subset(lasy,lasy$X_KOD =="PTLZ01")
+lasy$mean = exact_extract(temp,lasy,'mean')
+
+
+place$mean = exact_extract(temp,place,'mean')
+
+write_sf(cment,"D:/studia_mgr/Analizy/TempBDOT10k/wyniki/cmentarze.shp")
 
 
 
