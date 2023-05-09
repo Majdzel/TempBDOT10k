@@ -1,9 +1,10 @@
 #-----TEMPERATURA-----
-
 library(raster)
 library(terra)
 library(LST)
 library(sf)
+library(tmap)
+library(osmdata)
 
 B4= raster("2/B4.tif")
 B5= raster("2/B5.tif")
@@ -41,29 +42,57 @@ writeRaster(LST,f)
 
 #-----ANALIZA------
 library(exactextractr)
+
 #---Rastry---
-temp = raster("D:/studia_mgr/Analizy/TempBDOT10k/wyniki/temp.tif")
+temp = raster("C:/Users/lenovo/Documents/GitHub/TempBDOT10k//wyniki/temp.tif")
+
 #---Poligony---
-cment = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/cmentarze.shp")
-parki = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/parki.shp")
-lasy  = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/lasy.shp")
-place = read_sf("D:/studia_mgr/Analizy/TempBDOT10k/shp/bdot10k/place.shp")
+cment = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/cmentarze.shp")
+parki = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/parki.shp")
+lasy  = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/lasy.shp")
+place = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/place.shp")
 
 #---ExtractValue-----
 cment = subset(cment,cment$X_KOD =="KUSC01")
-cment$mean = exact_extract(temp,cment,'mean')
+cment$srednia = exact_extract(temp,cment,'mean')
 
-parki = subset(parki,parki$X_KOD =="KUSK04	")
-parki$mean = exact_extract(temp,parki,'mean')
+parki = subset(parki,parki$X_KOD =="KUSK04")
+parki$srednia = exact_extract(temp,parki,'mean')
 
 lasy = subset(lasy,lasy$X_KOD =="PTLZ01")
-lasy$mean = exact_extract(temp,lasy,'mean')
+lasy$srednia = exact_extract(temp,lasy,'mean')
 
 
-place$mean = exact_extract(temp,place,'mean')
+place$srednia = exact_extract(temp,place,'mean')
 
 write_sf(cment,"D:/studia_mgr/Analizy/TempBDOT10k/wyniki/cmentarze.shp")
 
 
+#---wyświetlanie--------
+tm_shape(zasieg) + 
+  tm_polygons() +
+  tm_shape(cment) + 
+  tm_polygons("srednia", palette = "Reds") +
+  tm_layout(main.title = "Średnia temperatura: Cmentarze") +
+  tm_compass(type = "arrow", position = c("right", "top")) + 
+  tm_scale_bar(position = c("right", "bottom"))
+  
 
+tm_shape(zasieg) + 
+  tm_polygons() +
+  tm_shape(place) + 
+  tm_polygons("srednia", palette = "Reds") +
+  tm_layout(main.title = "Średnia temperatura: Place")
 
+tm_shape(zasieg) + 
+  tm_polygons() +
+  tm_shape(lasy) + 
+  tm_polygons("mean", palette = "Reds") +
+  tm_layout(main.title = "Średnia temperatura: Lasy")
+
+tm_shape(zasieg) + 
+  tm_polygons() +
+  tm_shape(parki) + 
+  tm_polygons("mean", palette = "Reds") +
+  tm_layout(main.title = "Średnia temperatura: Parki")
+  
