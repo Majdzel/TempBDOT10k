@@ -5,7 +5,7 @@ library(LST)
 library(sf)
 library(tmap)
 library(osmdata)
-
+library(ggplot2)
 B4= raster("2/B4.tif")
 B5= raster("2/B5.tif")
 B10= raster("2/B10.tif")
@@ -54,45 +54,70 @@ place = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/place.
 
 #---ExtractValue-----
 cment = subset(cment,cment$X_KOD =="KUSC01")
-cment$srednia = exact_extract(temp,cment,'mean')
+cment$Srednia = exact_extract(temp,cment,'mean')
 
 parki = subset(parki,parki$X_KOD =="KUSK04")
-parki$srednia = exact_extract(temp,parki,'mean')
+parki$Srednia = exact_extract(temp,parki,'mean')
 
 lasy = subset(lasy,lasy$X_KOD =="PTLZ01")
-lasy$srednia = exact_extract(temp,lasy,'mean')
+lasy$Srednia = exact_extract(temp,lasy,'mean')
 
+place$Srednia = exact_extract(temp,place,'mean')
 
-place$srednia = exact_extract(temp,place,'mean')
 
 write_sf(cment,"D:/studia_mgr/Analizy/TempBDOT10k/wyniki/cmentarze.shp")
 
 
-#---wyświetlanie--------
+#---Wizualizacja--------
 tm_shape(zasieg) + 
   tm_polygons() +
   tm_shape(cment) + 
-  tm_polygons("srednia", palette = "Reds") +
+  tm_polygons("Srednia", palette = "Reds", lwd = 0) +
   tm_layout(main.title = "Średnia temperatura: Cmentarze") +
   tm_compass(type = "arrow", position = c("right", "top")) + 
   tm_scale_bar(position = c("right", "bottom"))
   
-
 tm_shape(zasieg) + 
   tm_polygons() +
   tm_shape(place) + 
-  tm_polygons("srednia", palette = "Reds") +
-  tm_layout(main.title = "Średnia temperatura: Place")
+  tm_polygons("Srednia", palette = "Reds", lwd = 0) +
+  tm_layout(main.title = "Średnia temperatura: Place") +
+  tm_compass(type = "arrow", position = c("right", "top")) + 
+  tm_scale_bar(position = c("right", "bottom"))
 
 tm_shape(zasieg) + 
   tm_polygons() +
   tm_shape(lasy) + 
-  tm_polygons("mean", palette = "Reds") +
-  tm_layout(main.title = "Średnia temperatura: Lasy")
+  tm_polygons("Srednia", palette = "Reds", lwd = 0) +
+  tm_layout(main.title = "Średnia temperatura: Lasy") +
+  tm_compass(type = "arrow", position = c("right", "top")) + 
+  tm_scale_bar(position = c("right", "bottom"))
 
 tm_shape(zasieg) + 
   tm_polygons() +
   tm_shape(parki) + 
-  tm_polygons("mean", palette = "Reds") +
-  tm_layout(main.title = "Średnia temperatura: Parki")
-  
+  tm_polygons("Srednia", palette = "Reds", lwd = 0) +
+  tm_layout(main.title = "Średnia temperatura: Parki") +
+  tm_compass(type = "arrow", position = c("right", "top")) + 
+  tm_scale_bar(position = c("right", "bottom"))
+
+
+tm_shape(zasieg) + 
+  tm_polygons() +
+  tm_shape(cment) + 
+  tm_polygons("Srednia", palette = "Reds", lwd = 0, legend.show = FALSE) +
+  tm_layout(main.title = "Średnia temperatura wszystkich obiektów") +
+  tm_shape(place) + 
+  tm_polygons("Srednia", palette = "Reds", lwd = 0) +
+  tm_shape(lasy) + 
+  tm_polygons("Srednia", palette = "Reds", lwd = 0, legend.show = FALSE) +
+  tm_shape(parki) + 
+  tm_polygons("Srednia", palette = "Reds", lwd = 0, legend.show = FALSE) +
+  tm_compass(type = "arrow", position = c("right", "top")) + 
+  tm_scale_bar(position = c("right", "bottom"))
+
+# Narysowanie histogramu
+hist(place$Srednia,xlab = "Średnia temperatura", ylab = "Liczba obiektów", main = "Wykres średnich temperatur: place", col="Red")
+vals <- hist(place$Srednia, plot = FALSE)$counts
+text(x = seq_along(vals), y = vals, labels = vals, pos = 3)
+
