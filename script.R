@@ -1,11 +1,12 @@
-#-----TEMPERATURA-----
+#-----Biblioteki-------
 library(raster)
 library(terra)
 library(LST)
 library(sf)
 library(tmap)
-library(osmdata)
-library(ggplot2)
+library(exactextractr)
+
+#-----TEMPERATURA-----
 B4= raster("2/B4.tif")
 B5= raster("2/B5.tif")
 B10= raster("2/B10.tif")
@@ -37,20 +38,17 @@ PV = Pv(NDVI = NDVI,minNDVI = 0.2, maxNDVI = 0.5)
 E = 0.004*PV+0.986
 LST = BT/(1+(10.8*BT/14388)*log10(E))
 
-f = file.path("D:/studia_mgr/Analizy/TempBDOT10k/wyniki/temp.tif")
+f = file.path("wyniki/temp.tif")
 writeRaster(LST,f)
 
-#-----ANALIZA------
-library(exactextractr)
-
 #---Rastry---
-temp = raster("C:/Users/lenovo/Documents/GitHub/TempBDOT10k//wyniki/temp.tif")
+temp = raster("wyniki/temp.tif")
 
 #---Poligony---
-cment = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/cmentarze.shp")
-parki = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/parki.shp")
-lasy  = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/lasy.shp")
-place = read_sf("C:/Users/lenovo/Documents/GitHub/TempBDOT10k/shp/bdot10k/place.shp")
+cment = read_sf("shp/bdot10k/cmentarze.shp")
+parki = read_sf("shp/bdot10k/parki.shp")
+lasy  = read_sf("shp/bdot10k/lasy.shp")
+place = read_sf("shp/bdot10k/place.shp")
 
 #---ExtractValue-----
 cment = subset(cment,cment$X_KOD =="KUSC01")
@@ -65,7 +63,7 @@ lasy$Srednia = exact_extract(temp,lasy,'mean')
 place$Srednia = exact_extract(temp,place,'mean')
 
 
-write_sf(cment,"D:/studia_mgr/Analizy/TempBDOT10k/wyniki/cmentarze.shp")
+write_sf(cment,"wyniki/cmentarze.shp")
 
 
 #---Wizualizacja--------
@@ -76,7 +74,7 @@ tm_shape(zasieg) +
   tm_layout(main.title = "Średnia temperatura: Cmentarze") +
   tm_compass(type = "arrow", position = c("right", "top")) + 
   tm_scale_bar(position = c("right", "bottom"))
-  
+
 tm_shape(zasieg) + 
   tm_polygons() +
   tm_shape(place) + 
@@ -101,7 +99,6 @@ tm_shape(zasieg) +
   tm_compass(type = "arrow", position = c("right", "top")) + 
   tm_scale_bar(position = c("right", "bottom"))
 
-
 tm_shape(zasieg) + 
   tm_polygons() +
   tm_shape(cment) + 
@@ -116,8 +113,31 @@ tm_shape(zasieg) +
   tm_compass(type = "arrow", position = c("right", "top")) + 
   tm_scale_bar(position = c("right", "bottom"))
 
-# Narysowanie histogramu
-hist(place$Srednia,xlab = "Średnia temperatura", ylab = "Liczba obiektów", main = "Wykres średnich temperatur: place", col="Red")
-vals <- hist(place$Srednia, plot = FALSE)$counts
-text(x = seq_along(vals), y = vals, labels = vals, pos = 3)
+#-----Histogramy-------
+h = hist(cment$Srednia,xlab = "Średnia temperatura w stopniach Celcjusza", ylab = "Liczba obiektów", 
+         main = "Wykres średnich temperatur: Cmentarze", col="IndianRed", xlim = c(22,27))
+text(h$mids,h$counts,labels=h$counts, adj=c(0.5, -0.5))
+
+h = hist(place$Srednia,xlab = "Średnia temperatura w stopniach Celcjusza", ylab = "Liczba obiektów", 
+         main = "Wykres średnich temperatur: Place", col="IndianRed", xlim = c(20,32))
+text(h$mids,h$counts,labels=h$counts, adj=c(0.5, -0.5))
+
+h = hist(lasy$Srednia,xlab = "Średnia temperatura w stopniach Celcjusza", ylab = "Liczba obiektów", 
+         main = "Wykres średnich temperatur: Lasy", col="IndianRed", xlim = c(20,25))
+text(h$mids,h$counts,labels=h$counts, adj=c(0.5, -0.5))
+
+h = hist(parki$Srednia,xlab = "Średnia temperatura w stopniach Celcjusza", ylab = "Liczba obiektów",
+         main = "Wykres średnich temperatur: Parki", col="IndianRed", xlim = c(22,26))
+text(h$mids,h$counts,labels=h$counts, adj=c(0.5, -0.5))
+
+
+
+
+
+
+
+
+
+
+
 
